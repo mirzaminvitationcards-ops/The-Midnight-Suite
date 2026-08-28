@@ -499,7 +499,7 @@
         </div>
     </nav>
 
-    <!-- FIREBASE & SCRIPTS -->
+    <!-- FIREBASE & SCRIPTS (DISABLED/COMMENTED OUT) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -620,7 +620,8 @@
             */
         }
 
-        /* --- FIREBASE CONFIGURATION (FIRESTORE ONLY) --- */
+        /* --- DATABASE CONNECTIONS COMMENTED OUT --- */
+        /*
         const firebaseConfig = {
             apiKey: "AIzaSyCB5tx5ffwZENpTqU9otGTvxjmlgqyjwQ",
             authDomain: "ismail-yara-wedding.firebaseapp.com",
@@ -632,21 +633,33 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        /* ================= CLOUDINARY CONFIGURATION ================= */
         const CLOUDINARY_CLOUD_NAME = "k0qku3iy"; 
         const CLOUDINARY_UPLOAD_PRESET = "mirzam_uploads"; 
         const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+        */
 
-        /* ================= PLAN LIMITS CONFIGURATION ================= */
-        const ACTIVE_PLAN = "Astra"; 
+       /* ================= PLAN LIMITS CONFIGURATION ================= */
+        const ACTIVE_PLAN = "Astra"; // Change to "Aurora" for premium invitations
 
         const PLAN_LIMITS = {
-            "Astra":  { totalPhotos: 50, totalVoice: 20 },
-            "Aurora": { totalPhotos: 250, totalVoice: 100 }
+            "Astra":  { 
+                totalPhotos: 50, 
+                totalVoice: 20,
+                perUserPhotos: 3,
+                perUserVoice: 1
+            },
+            "Aurora": { 
+                totalPhotos: 250, 
+                totalVoice: 100,
+                perUserPhotos: 6,
+                perUserVoice: 2
+            }
         };
 
         const MAX_TOTAL_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].totalPhotos;
         const MAX_TOTAL_VOICES = PLAN_LIMITS[ACTIVE_PLAN].totalVoice;
+        const MAX_USER_PHOTOS  = PLAN_LIMITS[ACTIVE_PLAN].perUserPhotos;
+        const MAX_USER_VOICES  = PLAN_LIMITS[ACTIVE_PLAN].perUserVoice;
 
         let totalPhotoCount = 0;
         let totalVoiceCount = 0;
@@ -685,7 +698,7 @@
             });
         }
 
-        /* ================= PHOTO & VIDEO UPLOAD LOGIC ================= */
+        /* ================= PHOTO & VIDEO UPLOAD LOGIC (DATABASE DISABLED) ================= */
         const photoInput = document.getElementById('photo-upload-input');
         const uploadBtn = document.getElementById('upload-photo-btn');
         const photoGrid = document.getElementById('guest-photo-grid');
@@ -696,10 +709,10 @@
                 alert(`The gallery is full (${MAX_TOTAL_PHOTOS} memories maximum).`);
                 return;
             }
-            if (myPhotoCount >= 3 && !isAdmin) {
-                alert("You have reached your personal limit of 3 uploads.");
-                return;
-            }
+            if (myPhotoCount >= MAX_USER_PHOTOS && !isAdmin) {
+    alert(`You have reached your personal limit of ${MAX_USER_PHOTOS} photos.`);
+    return;
+}
             photoInput.click();
         });
 
@@ -714,76 +727,44 @@
                 return;
             }
 
-            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> UPLOADING...';
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> PROCESSING...';
             
             try {
                 let fileToUpload = file;
-                let fileName = isVideo ? 'video.mp4' : 'photo.webp';
-                
                 if (!isVideo) {
                     fileToUpload = await compressImage(file, 800, 0.6);
                 }
                 
-                const formData = new FormData();
-                formData.append('file', fileToUpload, fileName);
-                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-                const cloudinaryRes = await fetch(CLOUDINARY_UPLOAD_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                const cloudinaryData = await cloudinaryRes.json();
+                // Local preview simulation since database is disconnected
+                const localUrl = URL.createObjectURL(fileToUpload);
                 
-                if (!cloudinaryData.secure_url) throw new Error("Cloudinary upload failed");
+                const item = document.createElement('div');
+                item.className = 'guest-photo-item';
+                
+                let mediaHTML = isVideo 
+                    ? `<video src="${localUrl}" controls playsinline></video>`
+                    : `<img src="${localUrl}" alt="Guest Memory">`;
+                
+                item.innerHTML = mediaHTML;
+                photoGrid.appendChild(item);
+                myPhotoCount++;
+                totalPhotoCount++;
 
-                await db.collection("test_photos").add({
-                    url: cloudinaryData.secure_url,
-                    type: isVideo ? 'video' : 'image',
-                    ownerId: myUserId,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
             } catch (error) {
-                console.error("Upload error: ", error);
-                alert("Failed to upload. Please try again.");
+                console.error("Processing error: ", error);
+                alert("Failed to process file locally.");
             } finally {
                 photoInput.value = ''; 
                 uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
             }
         });
 
-        db.collection("test_photos").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-            photoGrid.innerHTML = '';
-            myPhotoCount = 0;
-            totalPhotoCount = querySnapshot.size; 
-            
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.ownerId === myUserId) myPhotoCount++;
-                
-                const item = document.createElement('div');
-                item.className = 'guest-photo-item';
-                
-                let deleteHTML = '';
-                if (isAdmin || data.ownerId === myUserId) {
-                  deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
-                }
-                
-                let mediaHTML = '';
-                if (data.type === 'video') {
-                    mediaHTML = `<video src="${data.url}" controls playsinline></video>`;
-                } else {
-                    mediaHTML = `<img src="${data.url}" alt="Guest Memory">`;
-                }
-                
-                item.innerHTML = `
-                    ${deleteHTML}
-                    ${mediaHTML}
-                `;
-                photoGrid.appendChild(item);
-            });
-        });
+        /* --- DATABASE SNAPSHOT LISTENER COMMENTED OUT --- */
+        /*
+        db.collection("test_photos").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => { ... });
+        */
 
-        /* ================= VOICE RECORD LOGIC WITH TIMER ================= */
+        /* ================= VOICE RECORD LOGIC WITH TIMER (DATABASE DISABLED) ================= */
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
@@ -802,10 +783,10 @@
                     alert(`The voice message inbox is full (${MAX_TOTAL_VOICES} messages maximum).`);
                     return;
                 }
-                if (myVoiceCount >= 1 && !isAdmin) {
-                    alert("You have already shared a voice message (limit is 1 per guest).");
-                    return;
-                }
+               if (myVoiceCount >= MAX_USER_VOICES && !isAdmin) {
+    alert(`You have already shared your voice message limit (${MAX_USER_VOICES} allowed).`);
+    return;
+}
                 
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -829,10 +810,6 @@
                     
                     voiceBtn.style.background = 'red';
                     voiceBtn.style.color = 'white';
-                    
-                    // ==========================================
-                    // THE TIMER TEXT IS SET RIGHT HERE!
-                    // ==========================================
                     voiceText.innerText = 'RECORDING... 0s / 60s (TAP TO STOP)';
                     
                     recordTimer = setInterval(() => {
@@ -846,6 +823,7 @@
                         }
                     }, 1000);
                     
+                    audioChunks = [];
                     mediaRecorder.addEventListener("dataavailable", event => {
                         audioChunks.push(event.data);
                     });
@@ -855,35 +833,23 @@
                         
                         voiceBtn.style.background = 'var(--navy)';
                         voiceBtn.style.color = 'var(--moonlight)';
-                        voiceText.innerText = 'UPLOADING...';
+                        voiceText.innerText = 'SAVED LOCALLY';
                         
-                        const audioBlob = new Blob(audioChunks); 
-                        audioChunks = [];
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
                         
-                        try {
-                            const formData = new FormData();
-                            formData.append('file', audioBlob, 'voice.mp4');
-                            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-                            const cloudinaryRes = await fetch(CLOUDINARY_UPLOAD_URL, {
-                                method: 'POST',
-                                body: formData
-                            });
-                            const cloudinaryData = await cloudinaryRes.json();
-
-                            if (!cloudinaryData.secure_url) throw new Error("Cloudinary upload failed");
-
-                            await db.collection("test_voice").add({
-                                url: cloudinaryData.secure_url,
-                                ownerId: myUserId,
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        } catch (err) {
-                            console.error("Audio Upload error: ", err);
-                            alert("Failed to upload audio recording.");
-                        }
+                        // Local preview simulation
+                        const item = document.createElement('div');
+                        item.className = 'voice-item';
+                        item.innerHTML = `<audio controls src="${audioUrl}"></audio>`;
+                        voicesDisplay.appendChild(item);
                         
-                        voiceText.innerText = 'TAP TO RECORD';
+                        myVoiceCount++;
+                        totalVoiceCount++;
+                        
+                        setTimeout(() => {
+                            voiceText.innerText = 'TAP TO RECORD';
+                        }, 2000);
                     });
                 } catch (err) {
                     alert("Microphone access denied or not supported.");
@@ -895,42 +861,22 @@
             }
         });
 
-        db.collection("test_voice").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-            voicesDisplay.innerHTML = '';
-            myVoiceCount = 0;
-            totalVoiceCount = querySnapshot.size; 
-            
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.ownerId === myUserId) myVoiceCount++;
-                
-                const item = document.createElement('div');
-                item.className = 'voice-item';
-                
-                let deleteHTML = '';
-                if (isAdmin || data.ownerId === myUserId) {
-                    deleteHTML = `<button class="delete-btn" style="position:relative; top:0; right:0;" onclick="deleteItem('test_voice', '${doc.id}')">DELETE</button>`;
-                }
-                
-                item.innerHTML = `
-                    <audio controls src="${data.url}"></audio>
-                    ${deleteHTML}
-                `;
-                voicesDisplay.appendChild(item);
-            });
-        });
+        /* --- DATABASE VOICE LISTENER COMMENTED OUT --- */
+        /*
+        db.collection("test_voice").orderBy("timestamp", "desc").onSnapshot(...);
+        */
 
-        /* ================= GLOBAL DELETE LOGIC ================= */
+        /* ================= GLOBAL DELETE LOGIC (DISABLED) ================= */
         window.deleteItem = async function(collectionName, docId) {
+            /* 
+            Database deletion code commented out:
             if (!confirm('Are you sure you want to delete this?')) return;
-            try {
-                await db.collection(collectionName).doc(docId).delete();
-            } catch (error) {
-                console.error("Error deleting item:", error);
-            }
+            await db.collection(collectionName).doc(docId).delete();
+            */
+            alert("Database connection is disabled in this mode.");
         };
 
-        /* ================= TEXT GUESTBOOK LOGIC ================= */
+        /* ================= TEXT GUESTBOOK LOGIC (DATABASE DISABLED) ================= */
         const wishForm = document.getElementById('guestbook-form');
         const wishesDisplay = document.getElementById('wishes-display');
 
@@ -939,36 +885,26 @@
             const name = document.getElementById('guest-name').value;
             const wish = document.getElementById('guest-wish').value;
             
-            db.collection("test_wishes").add({
-                name: name,
-                wish: wish,
-                ownerId: myUserId,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                wishForm.reset(); 
-            }).catch((error) => console.error("Error writing document: ", error));
+            // Local preview simulation
+            const card = document.createElement('div');
+            card.className = 'wish-card';
+            card.innerHTML = `
+                <h4>${name}</h4>
+                <p>"${wish}"</p>
+            `;
+            wishesDisplay.appendChild(card);
+            wishForm.reset(); 
+
+            /* 
+            Database write commented out:
+            db.collection("test_wishes").add({ ... });
+            */
         });
 
-        db.collection("test_wishes").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-            wishesDisplay.innerHTML = '';
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const card = document.createElement('div');
-                card.className = 'wish-card';
-                
-                let deleteHTML = '';
-                if (isAdmin || data.ownerId === myUserId) {
-                    deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_wishes', '${doc.id}')">DELETE</button>`;
-                }
-
-                card.innerHTML = `
-                    ${deleteHTML}
-                    <h4>${data.name}</h4>
-                    <p>"${data.wish}"</p>
-                `;
-                wishesDisplay.appendChild(card);
-            });
-        });
+        /* --- DATABASE WISHES LISTENER COMMENTED OUT --- */
+        /*
+        db.collection("test_wishes").orderBy("timestamp", "desc").onSnapshot(...);
+        */
     </script>
 </body>
 </html>

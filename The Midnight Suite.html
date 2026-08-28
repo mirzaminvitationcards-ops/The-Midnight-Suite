@@ -423,7 +423,6 @@
             <h3 class="gallery-title">GUEST MEMORIES</h3>
             <p class="announcement">Share your favorite photos or videos with us</p>
             
-            <!-- ADDED VIDEO ACCEPTANCE -->
             <input type="file" id="photo-upload-input" accept="image/*,video/*" style="display: none;">
             <button class="upload-btn" id="upload-photo-btn">
                 <i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
@@ -708,7 +707,6 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // NEW: Detect if video and enforce 15MB size limit to save free Cloudinary credits
             const isVideo = file.type.startsWith('video/');
             if (isVideo && file.size > 15 * 1024 * 1024) {
                 alert("Video is too large! Please choose a short clip under 15MB.");
@@ -722,7 +720,6 @@
                 let fileToUpload = file;
                 let fileName = isVideo ? 'video.mp4' : 'photo.webp';
                 
-                // Only compress if it is an image
                 if (!isVideo) {
                     fileToUpload = await compressImage(file, 800, 0.6);
                 }
@@ -741,7 +738,7 @@
 
                 await db.collection("test_photos").add({
                     url: cloudinaryData.secure_url,
-                    type: isVideo ? 'video' : 'image', // Save media type
+                    type: isVideo ? 'video' : 'image',
                     ownerId: myUserId,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -771,7 +768,6 @@
                   deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
                 }
                 
-                // NEW: Render Video Player or Image
                 let mediaHTML = '';
                 if (data.type === 'video') {
                     mediaHTML = `<video src="${data.url}" controls playsinline></video>`;
@@ -833,14 +829,16 @@
                     
                     voiceBtn.style.background = 'red';
                     voiceBtn.style.color = 'white';
+                    
+                    // ==========================================
+                    // THE TIMER TEXT IS SET RIGHT HERE!
+                    // ==========================================
                     voiceText.innerText = 'RECORDING... 0s / 60s (TAP TO STOP)';
                     
-                    // START THE TIMER
                     recordTimer = setInterval(() => {
                         secondsRecorded++;
                         voiceText.innerText = `RECORDING... ${secondsRecorded}s / 60s (TAP TO STOP)`;
                         
-                        // Auto-stop at 60 seconds
                         if (secondsRecorded >= 60) {
                             mediaRecorder.stop();
                             isRecording = false;
@@ -853,7 +851,7 @@
                     });
 
                     mediaRecorder.addEventListener("stop", async () => {
-                        clearInterval(recordTimer); // Stop timer
+                        clearInterval(recordTimer); 
                         
                         voiceBtn.style.background = 'var(--navy)';
                         voiceBtn.style.color = 'var(--moonlight)';
@@ -893,7 +891,7 @@
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
-                clearInterval(recordTimer); // Stop timer manually
+                clearInterval(recordTimer); 
             }
         });
 

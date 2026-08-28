@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Engagement Invitation - [Partner 1] & [Partner 2]</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:ital,wght@1,400&family=Inter:wght@400;700;800&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. FONTS & MOON-NIGHT VARIABLES
+           ========================================= */
+        :root {
+            --midnight: #0B1021;    
+            --navy: #151F38;        
+            --moonlight: #FDE29F;   
+            --silver: #C0C9D8;      
+            --white: #ffffff;
+            --border-color: rgba(192, 201, 216, 0.3);
+            --card-bg: rgba(21, 31, 56, 0.65); 
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html { scroll-behavior: auto; } 
+
+       body {
+            font-family: 'Inter', sans-serif;
+            color: var(--white); 
+            background-color: var(--midnight);
+            min-height: 100vh;
+            overflow-x: hidden;
+            
+            /* Just the starry sky background here now */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+                radial-gradient(circle at 85% 45%, rgba(255, 255, 255, 0.9) 1.5px, transparent 3px),
+                radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 20% 10%, rgba(253, 226, 159, 0.6) 2px, transparent 3px),
+                radial-gradient(circle at 75% 90%, rgba(255, 255, 255, 0.5) 1px, transparent 2px),
+                radial-gradient(circle at 40% 25%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+                radial-gradient(circle at 30% 60%, rgba(255, 255, 255, 0.6) 1px, transparent 2px);
+            background-size: 200px 300px, 350px 400px, 250px 350px, 400px 250px, 300px 450px, 150px 200px, 280px 380px;
+        }
+
+        /* The True Crescent Moon (Realistic Lunar Color) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 12%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            width: 45px;  
+            height: 45px; 
+            border-radius: 50%;
+            /* A realistic pale silver-white moon color */
+            box-shadow: inset 10px -8px 0 0 #EAEDF4;
+            /* A soft, natural lunar glow */
+            filter: drop-shadow(0 0 12px rgba(234, 237, 244, 0.8));
+            z-index: 0; 
+            pointer-events: none; 
+        }
+
+        /* =========================================
+           2. SOLID OPAQUE OVERLAY & OPEN BUTTON
+           ========================================= */
+        #blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--midnight); 
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+                radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.9) 1.5px, transparent 3px),
+                radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 70% 20%, rgba(253, 226, 159, 0.6) 2px, transparent 3px),
+                radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.5) 1px, transparent 2px),
+                radial-gradient(circle at 60% 60%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+                radial-gradient(circle at 85% 75%, rgba(253, 226, 159, 0.9) 1.5px, transparent 3px),
+                radial-gradient(circle at 10% 50%, rgba(255, 255, 255, 0.6) 1px, transparent 2px);
+            background-size: 150px 200px, 250px 250px, 180px 180px, 300px 300px, 200px 150px, 220px 220px, 280px 280px, 160px 160px;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease; 
+        }
+
+        .open-circle-btn {
+            width: 140px;
+            height: 140px;
+            background: var(--navy);
+            color: var(--moonlight); 
+            border-radius: 50%;
+            border: 3px solid var(--moonlight); 
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(253, 226, 159, 0.15); 
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        .open-circle-btn:hover {
+            transform: scale(1.05);
+            background: rgba(253, 226, 159, 0.1);
+            box-shadow: 0 0 45px rgba(253, 226, 159, 0.3);
+        }
+
+        /* =========================================
+           3. MAIN CONTENT
+           ========================================= */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 80px 20px 150px 20px;
+            margin: 0 auto;
+        }
+
+        .title { 
+            font-family: 'Cinzel', serif; 
+            font-size: 30px; 
+            letter-spacing: 5px; 
+            margin-bottom: 10px; 
+            text-transform: uppercase;
+            color: var(--moonlight);
+        }
+
+        .announcement { 
+            font-size: 12px; 
+            font-weight: 700; 
+            letter-spacing: 2px; 
+            line-height: 1.6; 
+            margin-bottom: 20px; 
+            color: var(--silver);
+            text-transform: uppercase;
+        }
+
+        .blue-line { width: 40px; height: 1px; background-color: var(--moonlight); margin: 0 auto 30px; }
+        .mini-blue-line { width: 45px; height: 2px; background-color: var(--moonlight); margin: 40px auto 15px; }
+
+        .names-stack { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 50px; }
+        .main-name { font-family: 'Cinzel', serif; font-size: 34px; letter-spacing: 6px; font-weight: 700; color: var(--white); }
+        .role { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--silver); }
+        .small-ampersand { font-family: 'Playfair Display', serif; font-style: italic; font-size: 28px; color: var(--moonlight); }
+
+        /* =========================================
+           4. GALLERY & INFO SECTIONS
+           ========================================= */
+        .gallery-title { font-family: 'Cinzel', serif; font-size: 24px; letter-spacing: 5px; margin-bottom: 25px; font-weight: 700; color: var(--moonlight); }
+        .photo-grid { display: flex; justify-content: center; margin-bottom: 50px; }
+        
+        .photo-placeholder { 
+            background: var(--navy); 
+            border-radius: 15px; 
+            width: 100%;
+            max-width: 300px; 
+            height: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            border: 1px dashed var(--moonlight);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--silver);
+        }
+
+        .reception-section { margin-bottom: 50px; }
+        .big-time { display: block; font-size: 40px; font-weight: 800; color: var(--white); }
+        .big-date { display: block; font-size: 16px; font-weight: 700; letter-spacing: 1px; margin: 10px 0 30px; color: var(--silver); }
+
+        /* COUNTDOWN STYLES */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .countdown-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            width: 75px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .countdown-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--moonlight);
+            margin-bottom: 4px;
+        }
+
+        .countdown-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--silver);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .venue-name { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--white); }
+        .venue-location { font-size: 14px; margin: 5px 0 15px; color: var(--silver); font-style: italic; }
+        .map-link-btn {
+            display: inline-block; padding: 14px 45px; background: transparent; border: 1.5px solid var(--moonlight);
+            color: var(--moonlight); border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 13px;
+            letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.3s ease;
+        }
+        .map-link-btn:hover { background: rgba(253, 226, 159, 0.1); }
+
+        /* =========================================
+           5. GUEST GALLERY & VOICE RECORD
+           ========================================= */
+        .upload-btn {
+            background: transparent; border: 1px dashed var(--moonlight); color: var(--moonlight);
+            padding: 20px; border-radius: 15px; cursor: pointer; width: 100%; margin-bottom: 20px;
+            transition: all 0.3s ease; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .upload-btn:hover { background: rgba(253, 226, 159, 0.1); }
+        
+        .guest-photo-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;
+        }
+        .guest-photo-item {
+            position: relative;
+            aspect-ratio: 1; background: var(--navy); border-radius: 10px; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; color: var(--silver); font-size: 24px;
+            overflow: hidden;
+        }
+        .guest-photo-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .delete-btn {
+            position: absolute; top: 5px; right: 5px; background: rgba(255, 0, 0, 0.7); color: white;
+            border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; z-index: 10;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+
+        .voice-btn {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--navy); border: 2px solid var(--moonlight);
+            color: var(--moonlight); font-size: 30px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .voice-btn:hover { background: rgba(253, 226, 159, 0.2); transform: scale(1.05); }
+        .voice-messages-container {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 20px;
+        }
+        .voice-item {
+            position: relative; background: var(--card-bg); padding: 10px 15px; border-radius: 15px;
+            border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;
+        }
+        .voice-item audio { width: 85%; height: 35px; outline: none; }
+
+        /* =========================================
+           6. GUESTBOOK SECTION & BUTTONS
+           ========================================= */
+        .guestbook-section { margin-top: 50px; margin-bottom: 20px; }
+        .guestbook-form { max-width: 350px; margin: 20px auto; display: flex; flex-direction: column; gap: 12px; }
+        .guestbook-form input, .guestbook-form textarea { 
+            padding: 15px; border-radius: 15px; border: 1px solid var(--border-color); background: var(--card-bg);
+            color: var(--white); font-family: 'Inter', sans-serif; font-size: 15px; width: 100%; outline: none; transition: 0.3s;
+        }
+        .guestbook-form input::placeholder, .guestbook-form textarea::placeholder { color: var(--silver); opacity: 0.7; }
+        .guestbook-form input:focus, .guestbook-form textarea:focus { border-color: var(--moonlight); }
+
+        .oval-btn-small { 
+            padding: 15px; background: var(--moonlight); color: var(--midnight); border-radius: 50px; 
+            border: none; font-weight: 800; cursor: pointer; transition: 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .oval-btn-small:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(253, 226, 159, 0.2); }
+
+        .wish-card {
+            position: relative; background: var(--card-bg); padding: 20px; border-radius: 20px;
+            margin-top: 15px; text-align: left; border: 1px solid var(--border-color); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .wish-card h4 { font-size: 14px; font-weight: 800; color: var(--moonlight); text-transform: uppercase; margin-bottom: 5px; }
+        .wish-card p { font-size: 14px; color: var(--white); line-height: 1.5; }
+        
+        .oval-btn { 
+            display: inline-block; padding: 16px 70px; background: transparent; color: var(--moonlight); 
+            border: 1px solid var(--moonlight); border-radius: 50px; font-family: 'Inter', sans-serif;
+            font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; 
+            margin-top: 40px; transition: 0.3s; cursor: pointer;
+        }
+        .oval-btn:hover { background: rgba(253, 226, 159, 0.1); }
+
+        /* =========================================
+           7. MIRZAM CREDIT FOOTER 
+           ========================================= */
+        .credit-badge-container { display: flex; flex-direction: column; align-items: center; margin-top: 30px; padding-bottom: 20px; gap: 10px; }
+        .made-by-text { font-size: 11px; color: var(--silver); text-transform: lowercase; letter-spacing: 1.5px; font-weight: 700; }
+        .mirzam-circular-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--moonlight); box-shadow: 0 4px 15px rgba(253, 226, 159, 0.15); transition: 0.3s; }
+        .mirzam-circular-logo:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(253, 226, 159, 0.3); }
+
+        /* =========================================
+           8. FLOATING TAB BAR
+           ========================================= */
+        .floating-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 500px;
+            background: rgba(21, 31, 56, 0.95); backdrop-filter: blur(10px); height: 70px; border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid var(--border-color); z-index: 9999; display: flex; align-items: center;
+        }
+        .nav-container { display: flex; width: 100%; justify-content: space-around; align-items: center; padding: 0 10px; }
+        .nav-item { flex: 1; text-align: center; color: var(--silver); display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; border: none; background: none; transition: color 0.3s ease; }
+        .nav-item:hover { color: var(--moonlight); }
+        .nav-item i { font-size: 18px; }
+        .nav-item span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
+
+        @media screen and (max-width: 768px) {
+            .main-content { padding: 40px 15px 140px 15px; }
+            .title { font-size: 24px; }
+            .main-name { font-size: 28px; }
+            .countdown-box { width: 65px; height: 70px; }
+            .countdown-num { font-size: 22px; }
+            .countdown-label { font-size: 9px; }
+            .countdown-container { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COMPLETELY OPAQUE OVERLAY -->
+    <div id="blur-overlay">
+        <button class="open-circle-btn" onclick="openInvitation()">Open</button>
+    </div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="weddingMusic" loop>
+        <source src="The Midnight Suite_Song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="main-content-section">
+        <h1 class="title">ENGAGEMENT INFO</h1>
+        
+        <p class="announcement">You are invited to the<br>engagement party of</p>
+        <div class="blue-line"></div>
+
+        <div class="names-stack">
+            <h2 class="main-name">[PARTNER 1]</h2>
+            <span class="role">FIANCÉ</span>
+            <span class="small-ampersand">&</span>
+            <h2 class="main-name">[PARTNER 2]</h2>
+            <span class="role">FIANCÉE</span>
+        </div>
+
+        <div class="gallery-section" id="gallery-section">
+            <h3 class="gallery-title">PHOTO GALLERY</h3>
+            <div class="photo-grid">
+                <div class="photo-placeholder">
+                    <i class="far fa-image" style="font-size: 50px; margin-bottom: 15px; color: var(--moonlight);"></i>
+                    <p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;">Couple Photo Placeholder</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="reception-section" id="reception-section">
+            <div class="mini-blue-line"></div>
+            <h2 class="gallery-title">EVENT INFO</h2>
+            <div class="time-date-box">
+                <span class="big-time">[TIME]</span>
+                <span class="big-date">[DAY] | [MONTH] | [DATE]</span>
+            </div>
+
+            <!-- COUNTDOWN SECTION -->
+            <div class="countdown-container">
+                <div class="countdown-box">
+                    <span class="countdown-num" id="cd-days">00</span>
+                    <span class="countdown-label">DAYS</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-num" id="cd-hours">00</span>
+                    <span class="countdown-label">HOURS</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-num" id="cd-mins">00</span>
+                    <span class="countdown-label">MINS</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-num" id="cd-secs">00</span>
+                    <span class="countdown-label">SECS</span>
+                </div>
+            </div>
+            <!-- END COUNTDOWN SECTION -->
+        </div>
+
+        <div class="venue-section" id="venue-section">
+            <div class="mini-blue-line"></div> 
+            <h3 class="gallery-title">VENUE LOCATION</h3>
+            <p class="venue-name">[VENUE NAME]</p>
+            <p class="venue-location">[Write your specific venue location or address here]</p>
+            <a href="[MAP_LINK_URL]" target="_blank" class="map-link-btn">VIEW ON MAP</a>
+        </div>
+        
+        <!-- GUEST PHOTO GALLERY SECTION -->
+        <div class="guest-gallery-section" id="guest-gallery-section" style="margin-top: 50px;">
+            <div class="mini-blue-line"></div>
+            <h3 class="gallery-title">GUEST MEMORIES</h3>
+            <p class="announcement">Share your favorite moments with us</p>
+            
+            <input type="file" id="photo-upload-input" accept="image/*" style="display: none;">
+            <button class="upload-btn" id="upload-photo-btn">
+                <i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                SHARE A MEMORY
+            </button>
+            <div class="guest-photo-grid" id="guest-photo-grid">
+                <!-- Dynamically populated photos will go here -->
+            </div>
+        </div>
+        
+        <!-- VOICE MESSAGE SECTION -->
+        <div class="voice-message-section" id="voice-message-section" style="margin-top: 50px;">
+            <div class="mini-blue-line"></div>
+            <h3 class="gallery-title">VOICE WISHES</h3>
+            <p class="announcement">Record a personal voice message for the couple</p>
+            <button class="voice-btn" id="record-voice-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <p id="voice-status-text" style="font-size: 11px; color: var(--silver); font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Tap to Record</p>
+            
+            <div class="voice-messages-container" id="voice-messages-display">
+                <!-- Dynamically populated voices will go here -->
+            </div>
+        </div>
+
+        <!-- GUESTBOOK SECTION -->
+        <div class="guestbook-section" id="guestbook-section">
+            <div class="mini-blue-line"></div>
+            <h3 class="gallery-title">GUESTBOOK</h3>
+            <p class="announcement" style="margin-bottom: 20px;">Leave your blessings & wishes for the couple</p>
+            
+            <form id="guestbook-form" class="guestbook-form">
+                <input type="text" id="guest-name" placeholder="Your Name" required>
+                <textarea id="guest-wish" placeholder="Write your wishes here..." rows="4" required></textarea>
+                <button type="submit" class="oval-btn-small">SEND WISHES</button>
+            </form>
+            <div id="wishes-display" class="wishes-container"></div>
+        </div>
+        
+        <!-- GO BACK BUTTON -->
+        <button onclick="window.location.reload()" class="oval-btn">GO BACK</button>
+        
+        <!-- MIRZAM CREDIT BADGE -->
+        <div class="credit-badge-container">
+            <span class="made-by-text">made by Mirzam</span> 
+            <a href="https://mirzaminvitationcards-ops.github.io/mirzam.eg/Mirzam's_Main_page" target="_blank">
+                <img src="Mirazam's-logo.webp" alt="Mirzam Logo" class="mirzam-circular-logo">
+            </a>
+        </div>
+    </div>
+
+    <!-- UPDATED FLOATING NAVIGATION -->
+    <nav class="floating-nav">
+        <div class="nav-container">
+            <a href="javascript:void(0)" onclick="scrollToSection('gallery-section')" class="nav-item">
+                <i class="far fa-images"></i><span>Couple</span>
+            </a>
+            <a href="javascript:void(0)" onclick="scrollToSection('guest-gallery-section')" class="nav-item">
+                <i class="fas fa-camera"></i><span>Photos</span>
+            </a>
+            <a href="javascript:void(0)" onclick="scrollToSection('voice-message-section')" class="nav-item">
+                <i class="fas fa-microphone"></i><span>Voice</span>
+            </a>
+            <a href="javascript:void(0)" onclick="scrollToSection('venue-section')" class="nav-item">
+                <i class="fas fa-map-marker-alt"></i><span>Location</span>
+            </a>
+            <a href="javascript:void(0)" onclick="scrollToSection('guestbook-section')" class="nav-item">
+                <i class="far fa-comment-dots"></i><span>Wishes</span>
+            </a>
+            <div class="nav-item" onclick="toggleMusic()" style="cursor:pointer;">
+                <i id="navMusicIcon" class="fas fa-pause"></i>
+                <span id="navMusicText">Stop</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FIREBASE & SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // Force scroll to top on reload to ensure the blur-overlay covers the screen properly
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        // Check if Admin Mode is active via URL parameter (e.g. index.html?admin=true)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('admin') === 'true';
+
+        // Generate or retrieve a guest ID
+        let myUserId = localStorage.getItem('wedding_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('wedding_user_id', myUserId);
+
+        const weddingAudio = document.getElementById("weddingMusic");
+        const navMusicIcon = document.getElementById("navMusicIcon");
+        const navMusicText = document.getElementById("navMusicText");
+
+        let autoScrollId;
+        let isAutoScrolling = false;
+
+        function stopAutoScroll(e) {
+            if (e && e.target && e.target.closest('[onclick="toggleMusic()"]')) {
+                return; 
+            }
+            if (isAutoScrolling) {
+                isAutoScrolling = false;
+                cancelAnimationFrame(autoScrollId);
+                window.removeEventListener('wheel', stopAutoScroll);
+                window.removeEventListener('touchmove', stopAutoScroll);
+                window.removeEventListener('mousedown', stopAutoScroll);
+                window.removeEventListener('touchstart', stopAutoScroll); 
+                document.removeEventListener('keydown', stopAutoScroll);
+            }
+        }
+
+        // OPEN INVITATION LOGIC
+        function openInvitation() {
+            const overlay = document.getElementById('blur-overlay');
+            
+            weddingAudio.play().then(() => {
+                updateMusicUI();
+            }).catch(e => console.log("Audio playback failed:", e));
+
+            overlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                
+                isAutoScrolling = true;
+                window.addEventListener('wheel', stopAutoScroll, { passive: true });       
+                window.addEventListener('touchmove', stopAutoScroll, { passive: true });   
+                window.addEventListener('touchstart', stopAutoScroll, { passive: true }); 
+                window.addEventListener('mousedown', stopAutoScroll, { passive: true });   
+                document.addEventListener('keydown', stopAutoScroll, { passive: true });   
+
+                function autoScroll() {
+                    if (isAutoScrolling && (window.innerHeight + Math.ceil(window.scrollY) < document.documentElement.scrollHeight)) {
+                        window.scrollBy(0, 1); 
+                        autoScrollId = requestAnimationFrame(autoScroll);
+                    }
+                }
+                autoScroll();
+                
+                // Initialize Countdown once opened
+                startCountdown();
+            }, 1000); 
+        }
+
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) {
+                stopAutoScroll(); 
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function toggleMusic() {
+            if (weddingAudio.paused) {
+                weddingAudio.play().then(updateMusicUI).catch(e => console.log("Playback error"));
+            } else {
+                weddingAudio.pause();
+                updateMusicUI();
+            }
+        }
+
+        function updateMusicUI() {
+            if (weddingAudio.paused) {
+                if (navMusicIcon) navMusicIcon.className = "fas fa-play";
+                if (navMusicText) navMusicText.innerText = "Play";
+            } else {
+                if (navMusicIcon) navMusicIcon.className = "fas fa-pause";
+                if (navMusicText) navMusicText.innerText = "Pause";
+            }
+        }
+
+        // COUNTDOWN LOGIC
+        function startCountdown() {
+            /*
+            const targetDate = new Date("Dec 31, 2026 00:00:00").getTime();
+            
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("cd-days").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("cd-hours").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("cd-mins").innerText = mins < 10 ? "0" + mins : mins;
+                document.getElementById("cd-secs").innerText = secs < 10 ? "0" + secs : secs;
+            }, 1000);
+            */
+        }
+
+        /* --- FIREBASE TEST DATABASE LOGIC --- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyCB5tx5ffwZENpTqU9otGTvxjmlgqyjwQ",
+            authDomain: "ismail-yara-wedding.firebaseapp.com",
+            projectId: "ismail-yara-wedding",
+            storageBucket: "ismail-yara-wedding.firebasestorage.app",
+            messagingSenderId: "192107873346",
+            appId: "1:192107873346:web:db146674f6632ffb3759db"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+      /* ================= PLAN LIMITS CONFIGURATION ================= */
+        // Change this to "Aurora" when deploying for a premium customer
+        const ACTIVE_PLAN = "Astra"; 
+
+        const PLAN_LIMITS = {
+            "Astra":  { totalPhotos: 50, totalVoice: 20 },
+            "Aurora": { totalPhotos: 250, totalVoice: 100 }
+        };
+
+        const MAX_TOTAL_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].totalPhotos;
+        const MAX_TOTAL_VOICES = PLAN_LIMITS[ACTIVE_PLAN].totalVoice;
+
+        let totalPhotoCount = 0;
+        let totalVoiceCount = 0;
+
+        /* ================= CLIENT-SIDE IMAGE COMPRESSOR ================= */
+        function compressImage(file, maxWidth = 1200, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                resolve(blob);
+                            } else {
+                                reject(new Error('Canvas compression failed'));
+                            }
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = (err) => reject(err);
+                };
+                reader.onerror = (err) => reject(err);
+            });
+        }
+
+        /* ================= PHOTO UPLOAD LOGIC ================= */
+        const photoInput = document.getElementById('photo-upload-input');
+        const uploadBtn = document.getElementById('upload-photo-btn');
+        const photoGrid = document.getElementById('guest-photo-grid');
+        let myPhotoCount = 0;
+
+        uploadBtn.addEventListener('click', () => {
+            // 1. Check Total Invitation Limit First
+            if (totalPhotoCount >= MAX_TOTAL_PHOTOS && !isAdmin) {
+                alert(`The photo gallery is full (${MAX_TOTAL_PHOTOS} photos maximum).`);
+                return;
+            }
+            // 2. Check Individual Guest Limit Second
+            if (myPhotoCount >= 3 && !isAdmin) {
+                alert("You have reached your personal limit of 3 photos.");
+                return;
+            }
+            photoInput.click();
+        });
+
+        photoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> OPTIMIZING & UPLOADING...';
+            
+            try {
+                const compressedBlob = await compressImage(file, 1200, 0.75);
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child(`test_photos/${Date.now()}_photo.jpg`);
+                await fileRef.put(compressedBlob, { contentType: 'image/jpeg' });
+                const url = await fileRef.getDownloadURL();
+                
+                await db.collection("test_photos").add({
+                    url: url,
+                    ownerId: myUserId,
+                    storagePath: fileRef.fullPath,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Upload error: ", error);
+                alert("Failed to upload photo. Please try another image.");
+            } finally {
+                photoInput.value = ''; 
+            }
+            
+            uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
+        });
+
+        // Listen for photo updates
+        db.collection("test_photos").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+            photoGrid.innerHTML = '';
+            myPhotoCount = 0;
+            totalPhotoCount = querySnapshot.size; // Tracks total photos across the whole invitation
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.ownerId === myUserId) myPhotoCount++;
+                
+                const item = document.createElement('div');
+                item.className = 'guest-photo-item';
+                
+                let deleteHTML = '';
+                if (isAdmin || data.ownerId === myUserId) {
+                    deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}', '${data.storagePath}')"><i class="fas fa-trash"></i></button>`;
+                }
+                
+                item.innerHTML = `
+                    ${deleteHTML}
+                    <img src="${data.url}" alt="Guest Photo">
+                `;
+                photoGrid.appendChild(item);
+            });
+        });
+
+        /* ================= VOICE RECORD LOGIC ================= */
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let myVoiceCount = 0;
+        
+        const voiceBtn = document.getElementById('record-voice-btn');
+        const voiceText = document.getElementById('voice-status-text');
+        const voicesDisplay = document.getElementById('voice-messages-display');
+
+        voiceBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                // 1. Check Total Invitation Limit First
+                if (totalVoiceCount >= MAX_TOTAL_VOICES && !isAdmin) {
+                    alert(`The voice message inbox is full (${MAX_TOTAL_VOICES} messages maximum).`);
+                    return;
+                }
+                // 2. Check Individual Guest Limit Second
+                if (myVoiceCount >= 1 && !isAdmin) {
+                    alert("You have already shared a voice message (limit is 1 per guest).");
+                    return;
+                }
+                
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    isRecording = true;
+                    
+                    voiceBtn.style.background = 'red';
+                    voiceBtn.style.color = 'white';
+                    voiceText.innerText = 'RECORDING... TAP TO STOP';
+                    
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", async () => {
+                        voiceBtn.style.background = 'var(--navy)';
+                        voiceBtn.style.color = 'var(--moonlight)';
+                        voiceText.innerText = 'UPLOADING...';
+                        
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        audioChunks = [];
+                        
+                        try {
+                            const storageRef = storage.ref();
+                            const fileRef = storageRef.child(`test_voice/${Date.now()}.webm`);
+                            await fileRef.put(audioBlob);
+                            const url = await fileRef.getDownloadURL();
+                            
+                            await db.collection("test_voice").add({
+                                url: url,
+                                ownerId: myUserId,
+                                storagePath: fileRef.fullPath,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } catch (err) {
+                            console.error("Audio Upload error: ", err);
+                            alert("Failed to upload audio recording.");
+                        }
+                        
+                        voiceText.innerText = 'TAP TO RECORD';
+                    });
+                } catch (err) {
+                    alert("Microphone access denied or not supported.");
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        });
+
+        // Listen for voice message updates
+        db.collection("test_voice").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+            voicesDisplay.innerHTML = '';
+            myVoiceCount = 0;
+            totalVoiceCount = querySnapshot.size; // Tracks total voice notes across the whole invitation
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.ownerId === myUserId) myVoiceCount++;
+                
+                const item = document.createElement('div');
+                item.className = 'voice-item';
+                
+                let deleteHTML = '';
+                if (isAdmin || data.ownerId === myUserId) {
+                    deleteHTML = `<button class="delete-btn" style="position:relative; top:0; right:0;" onclick="deleteItem('test_voice', '${doc.id}', '${data.storagePath}')"><i class="fas fa-trash"></i></button>`;
+                }
+                
+                item.innerHTML = `
+                    <audio controls src="${data.url}"></audio>
+                    ${deleteHTML}
+                `;
+                voicesDisplay.appendChild(item);
+            });
+        });
+
+        /* ================= GLOBAL DELETE LOGIC ================= */
+        // Handles deletion for both Photos and Voice messages
+        window.deleteItem = async function(collectionName, docId, storagePath) {
+            if (!confirm('Are you sure you want to delete this?')) return;
+            try {
+                // Delete from Firestore
+                await db.collection(collectionName).doc(docId).delete();
+                // Delete from Storage
+                if(storagePath) {
+                    await storage.ref().child(storagePath).delete();
+                }
+            } catch (error) {
+                console.error("Error deleting item:", error);
+            }
+        };
+
+
+        /* ================= TEXT GUESTBOOK LOGIC ================= */
+        const wishForm = document.getElementById('guestbook-form');
+        const wishesDisplay = document.getElementById('wishes-display');
+
+        // Write to test_wishes collection
+        wishForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('guest-name').value;
+            const wish = document.getElementById('guest-wish').value;
+            
+            db.collection("test_wishes").add({
+                name: name,
+                wish: wish,
+                ownerId: myUserId,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                wishForm.reset(); 
+            }).catch((error) => console.error("Error writing document: ", error));
+        });
+
+        // Listen for updates from test_wishes collection
+        db.collection("test_wishes").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+            wishesDisplay.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.className = 'wish-card';
+                
+                let deleteHTML = '';
+                if (isAdmin || data.ownerId === myUserId) {
+                    deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_wishes', '${doc.id}', null)"><i class="fas fa-trash"></i></button>`;
+                }
+
+                card.innerHTML = `
+                    ${deleteHTML}
+                    <h4>${data.name}</h4>
+                    <p>"${data.wish}"</p>
+                `;
+                wishesDisplay.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

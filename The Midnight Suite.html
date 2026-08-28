@@ -50,7 +50,7 @@
             background-size: 200px 300px, 350px 400px, 250px 350px, 400px 250px, 300px 450px, 150px 200px, 280px 380px;
         }
 
-        /* The True Crescent Moon (Realistic Lunar Color) */
+        /* The True Crescent Moon */
         body::before {
             content: "";
             position: fixed;
@@ -60,9 +60,7 @@
             width: 45px;  
             height: 45px; 
             border-radius: 50%;
-            /* Realistic pale silver-white moon color */
             box-shadow: inset 10px -8px 0 0 #EAEDF4;
-            /* Soft natural lunar glow */
             filter: drop-shadow(0 0 12px rgba(234, 237, 244, 0.8));
             z-index: -1; 
             pointer-events: none; 
@@ -188,7 +186,6 @@
         .big-time { display: block; font-size: 40px; font-weight: 800; color: var(--white); }
         .big-date { display: block; font-size: 16px; font-weight: 700; letter-spacing: 1px; margin: 10px 0 30px; color: var(--silver); }
 
-        /* COUNTDOWN STYLES */
         .countdown-container {
             display: flex;
             justify-content: center;
@@ -210,20 +207,8 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .countdown-num {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--moonlight);
-            margin-bottom: 4px;
-        }
-
-        .countdown-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--silver);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
+        .countdown-num { font-size: 26px; font-weight: 800; color: var(--moonlight); margin-bottom: 4px; }
+        .countdown-label { font-size: 10px; font-weight: 800; color: var(--silver); text-transform: uppercase; letter-spacing: 1.5px; }
 
         .venue-name { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--white); }
         .venue-location { font-size: 14px; margin: 5px 0 15px; color: var(--silver); font-style: italic; }
@@ -253,8 +238,8 @@
             display: flex; align-items: center; justify-content: center; color: var(--silver); font-size: 24px;
             overflow: hidden;
         }
-        .guest-photo-item img {
-            width: 100%; height: 100%; object-fit: cover;
+        .guest-photo-item img, .guest-photo-item video {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
         }
         .delete-btn {
             position: absolute; 
@@ -277,10 +262,7 @@
             backdrop-filter: blur(4px);
             transition: all 0.3s ease;
         }
-        .delete-btn:hover {
-            background: var(--moonlight);
-            color: var(--midnight);
-        }
+        .delete-btn:hover { background: var(--moonlight); color: var(--midnight); }
 
         .voice-btn {
             width: 80px; height: 80px; border-radius: 50%; background: var(--navy); border: 2px solid var(--moonlight);
@@ -288,9 +270,7 @@
             margin: 0 auto 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .voice-btn:hover { background: rgba(253, 226, 159, 0.2); transform: scale(1.05); }
-        .voice-messages-container {
-            display: flex; flex-direction: column; gap: 10px; margin-top: 20px;
-        }
+        .voice-messages-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .voice-item {
             position: relative; background: var(--card-bg); padding: 10px 15px; border-radius: 15px;
             border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;
@@ -427,7 +407,6 @@
                     <span class="countdown-label">SECS</span>
                 </div>
             </div>
-            <!-- END COUNTDOWN SECTION -->
         </div>
 
         <div class="venue-section" id="venue-section">
@@ -438,19 +417,20 @@
             <a href="[MAP_LINK_URL]" target="_blank" class="map-link-btn">VIEW ON MAP</a>
         </div>
         
-        <!-- GUEST PHOTO GALLERY SECTION -->
+        <!-- GUEST PHOTO/VIDEO GALLERY SECTION -->
         <div class="guest-gallery-section" id="guest-gallery-section" style="margin-top: 50px;">
             <div class="mini-blue-line"></div>
             <h3 class="gallery-title">GUEST MEMORIES</h3>
-            <p class="announcement">Share your favorite moments with us</p>
+            <p class="announcement">Share your favorite photos or videos with us</p>
             
-            <input type="file" id="photo-upload-input" accept="image/*" style="display: none;">
+            <!-- ADDED VIDEO ACCEPTANCE -->
+            <input type="file" id="photo-upload-input" accept="image/*,video/*" style="display: none;">
             <button class="upload-btn" id="upload-photo-btn">
                 <i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
                 SHARE A MEMORY
             </button>
             <div class="guest-photo-grid" id="guest-photo-grid">
-                <!-- Dynamically populated photos -->
+                <!-- Dynamically populated media -->
             </div>
         </div>
         
@@ -655,11 +635,11 @@
 
         /* ================= CLOUDINARY CONFIGURATION ================= */
         const CLOUDINARY_CLOUD_NAME = "k0qku3iy"; 
-        const CLOUDINARY_UPLOAD_PRESET = "mirzam_uploads"; // Replace with your unsigned preset
+        const CLOUDINARY_UPLOAD_PRESET = "mirzam_uploads"; 
         const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
 
         /* ================= PLAN LIMITS CONFIGURATION ================= */
-        const ACTIVE_PLAN = "Astra"; // Change to "Aurora" for premium invitations
+        const ACTIVE_PLAN = "Astra"; 
 
         const PLAN_LIMITS = {
             "Astra":  { totalPhotos: 50, totalVoice: 20 },
@@ -706,7 +686,7 @@
             });
         }
 
-        /* ================= PHOTO UPLOAD LOGIC ================= */
+        /* ================= PHOTO & VIDEO UPLOAD LOGIC ================= */
         const photoInput = document.getElementById('photo-upload-input');
         const uploadBtn = document.getElementById('upload-photo-btn');
         const photoGrid = document.getElementById('guest-photo-grid');
@@ -714,11 +694,11 @@
 
         uploadBtn.addEventListener('click', () => {
             if (totalPhotoCount >= MAX_TOTAL_PHOTOS && !isAdmin) {
-                alert(`The photo gallery is full (${MAX_TOTAL_PHOTOS} photos maximum).`);
+                alert(`The gallery is full (${MAX_TOTAL_PHOTOS} memories maximum).`);
                 return;
             }
             if (myPhotoCount >= 3 && !isAdmin) {
-                alert("You have reached your personal limit of 3 photos.");
+                alert("You have reached your personal limit of 3 uploads.");
                 return;
             }
             photoInput.click();
@@ -728,13 +708,27 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> OPTIMIZING & UPLOADING...';
+            // NEW: Detect if video and enforce 15MB size limit to save free Cloudinary credits
+            const isVideo = file.type.startsWith('video/');
+            if (isVideo && file.size > 15 * 1024 * 1024) {
+                alert("Video is too large! Please choose a short clip under 15MB.");
+                photoInput.value = '';
+                return;
+            }
+
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> UPLOADING...';
             
             try {
-                const compressedBlob = await compressImage(file, 800, 0.6);
+                let fileToUpload = file;
+                let fileName = isVideo ? 'video.mp4' : 'photo.webp';
+                
+                // Only compress if it is an image
+                if (!isVideo) {
+                    fileToUpload = await compressImage(file, 800, 0.6);
+                }
                 
                 const formData = new FormData();
-                formData.append('file', compressedBlob, 'photo.webp');
+                formData.append('file', fileToUpload, fileName);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
                 const cloudinaryRes = await fetch(CLOUDINARY_UPLOAD_URL, {
@@ -747,12 +741,13 @@
 
                 await db.collection("test_photos").add({
                     url: cloudinaryData.secure_url,
+                    type: isVideo ? 'video' : 'image', // Save media type
                     ownerId: myUserId,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Upload error: ", error);
-                alert("Failed to upload photo. Please try again.");
+                alert("Failed to upload. Please try again.");
             } finally {
                 photoInput.value = ''; 
                 uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
@@ -776,19 +771,30 @@
                   deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
                 }
                 
+                // NEW: Render Video Player or Image
+                let mediaHTML = '';
+                if (data.type === 'video') {
+                    mediaHTML = `<video src="${data.url}" controls playsinline></video>`;
+                } else {
+                    mediaHTML = `<img src="${data.url}" alt="Guest Memory">`;
+                }
+                
                 item.innerHTML = `
                     ${deleteHTML}
-                    <img src="${data.url}" alt="Guest Photo">
+                    ${mediaHTML}
                 `;
                 photoGrid.appendChild(item);
             });
         });
 
-        /* ================= VOICE RECORD LOGIC ================= */
+        /* ================= VOICE RECORD LOGIC WITH TIMER ================= */
         let mediaRecorder;
         let audioChunks = [];
         let isRecording = false;
         let myVoiceCount = 0;
+        
+        let recordTimer;
+        let secondsRecorded = 0;
         
         const voiceBtn = document.getElementById('record-voice-btn');
         const voiceText = document.getElementById('voice-status-text');
@@ -823,16 +829,32 @@
 
                     mediaRecorder.start();
                     isRecording = true;
+                    secondsRecorded = 0;
                     
                     voiceBtn.style.background = 'red';
                     voiceBtn.style.color = 'white';
-                    voiceText.innerText = 'RECORDING... TAP TO STOP';
+                    voiceText.innerText = 'RECORDING... 0s / 60s (TAP TO STOP)';
+                    
+                    // START THE TIMER
+                    recordTimer = setInterval(() => {
+                        secondsRecorded++;
+                        voiceText.innerText = `RECORDING... ${secondsRecorded}s / 60s (TAP TO STOP)`;
+                        
+                        // Auto-stop at 60 seconds
+                        if (secondsRecorded >= 60) {
+                            mediaRecorder.stop();
+                            isRecording = false;
+                            clearInterval(recordTimer);
+                        }
+                    }, 1000);
                     
                     mediaRecorder.addEventListener("dataavailable", event => {
                         audioChunks.push(event.data);
                     });
 
                     mediaRecorder.addEventListener("stop", async () => {
+                        clearInterval(recordTimer); // Stop timer
+                        
                         voiceBtn.style.background = 'var(--navy)';
                         voiceBtn.style.color = 'var(--moonlight)';
                         voiceText.innerText = 'UPLOADING...';
@@ -871,6 +893,7 @@
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
+                clearInterval(recordTimer); // Stop timer manually
             }
         });
 

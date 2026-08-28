@@ -38,7 +38,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             
-            /* Just the starry sky background here now */
+            /* Starry sky background */
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
                 radial-gradient(circle at 85% 45%, rgba(255, 255, 255, 0.9) 1.5px, transparent 3px),
@@ -60,9 +60,9 @@
             width: 45px;  
             height: 45px; 
             border-radius: 50%;
-            /* A realistic pale silver-white moon color */
+            /* Realistic pale silver-white moon color */
             box-shadow: inset 10px -8px 0 0 #EAEDF4;
-            /* A soft, natural lunar glow */
+            /* Soft natural lunar glow */
             filter: drop-shadow(0 0 12px rgba(234, 237, 244, 0.8));
             z-index: -1; 
             pointer-events: none; 
@@ -450,7 +450,7 @@
                 SHARE A MEMORY
             </button>
             <div class="guest-photo-grid" id="guest-photo-grid">
-                <!-- Dynamically populated photos will go here -->
+                <!-- Dynamically populated photos -->
             </div>
         </div>
         
@@ -465,7 +465,7 @@
             <p id="voice-status-text" style="font-size: 11px; color: var(--silver); font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Tap to Record</p>
             
             <div class="voice-messages-container" id="voice-messages-display">
-                <!-- Dynamically populated voices will go here -->
+                <!-- Dynamically populated voices -->
             </div>
         </div>
 
@@ -523,20 +523,16 @@
     <!-- FIREBASE & SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <script>
-        // Force scroll to top on reload to ensure the blur-overlay covers the screen properly
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
         window.scrollTo(0, 0);
 
-        // Check if Admin Mode is active via URL parameter (e.g. index.html?admin=true)
         const urlParams = new URLSearchParams(window.location.search);
         const isAdmin = urlParams.get('admin') === 'true';
 
-        // Generate or retrieve a guest ID
         let myUserId = localStorage.getItem('wedding_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('wedding_user_id', myUserId);
 
@@ -562,7 +558,6 @@
             }
         }
 
-        // OPEN INVITATION LOGIC
         function openInvitation() {
             const overlay = document.getElementById('blur-overlay');
             
@@ -590,7 +585,6 @@
                 }
                 autoScroll();
                 
-                // Initialize Countdown once opened
                 startCountdown();
             }, 1000); 
         }
@@ -622,11 +616,9 @@
             }
         }
 
-        // COUNTDOWN LOGIC
         function startCountdown() {
             /*
             const targetDate = new Date("Dec 31, 2026 00:00:00").getTime();
-            
             const timer = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
@@ -649,7 +641,7 @@
             */
         }
 
-        /* --- FIREBASE TEST DATABASE LOGIC --- */
+        /* --- FIREBASE CONFIGURATION (FIRESTORE ONLY) --- */
         const firebaseConfig = {
             apiKey: "AIzaSyCB5tx5ffwZENpTqU9otGTvxjmlgqyjwQ",
             authDomain: "ismail-yara-wedding.firebaseapp.com",
@@ -660,11 +652,14 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
-      /* ================= PLAN LIMITS CONFIGURATION ================= */
-        // Change this to "Aurora" when deploying for a premium customer
-        const ACTIVE_PLAN = "Astra"; 
+        /* ================= CLOUDINARY CONFIGURATION ================= */
+        const CLOUDINARY_CLOUD_NAME = "k0qku3iy"; 
+        const CLOUDINARY_UPLOAD_PRESET = "mirzam_uploads"; // Replace with your unsigned preset
+        const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+
+        /* ================= PLAN LIMITS CONFIGURATION ================= */
+        const ACTIVE_PLAN = "Astra"; // Change to "Aurora" for premium invitations
 
         const PLAN_LIMITS = {
             "Astra":  { totalPhotos: 50, totalVoice: 20 },
@@ -677,7 +672,7 @@
         let totalPhotoCount = 0;
         let totalVoiceCount = 0;
 
-        /* ================= CLIENT-SIDE IMAGE COMPRESSOR (OPTIMIZED FOR SPEED & WEBP) ================= */
+        /* ================= CLIENT-SIDE IMAGE COMPRESSOR (WEBP) ================= */
         function compressImage(file, maxWidth = 800, quality = 0.6) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -700,13 +695,9 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // CHANGED TO WEBP FOR FASTER UPLOADS
                         canvas.toBlob((blob) => {
-                            if (blob) {
-                                resolve(blob);
-                            } else {
-                                reject(new Error('Canvas compression failed'));
-                            }
+                            if (blob) resolve(blob);
+                            else reject(new Error('Canvas compression failed'));
                         }, 'image/webp', quality);
                     };
                     img.onerror = (err) => reject(err);
@@ -722,12 +713,10 @@
         let myPhotoCount = 0;
 
         uploadBtn.addEventListener('click', () => {
-            // 1. Check Total Invitation Limit First
             if (totalPhotoCount >= MAX_TOTAL_PHOTOS && !isAdmin) {
                 alert(`The photo gallery is full (${MAX_TOTAL_PHOTOS} photos maximum).`);
                 return;
             }
-            // 2. Check Individual Guest Limit Second
             if (myPhotoCount >= 3 && !isAdmin) {
                 alert("You have reached your personal limit of 3 photos.");
                 return;
@@ -743,30 +732,33 @@
             
             try {
                 const compressedBlob = await compressImage(file, 800, 0.6);
-                const storageRef = storage.ref();
-                // CHANGED EXTENSION TO .webp
-                const fileRef = storageRef.child(`test_photos/${Date.now()}_photo.webp`);
-                // CHANGED CONTENT TYPE TO image/webp
-                await fileRef.put(compressedBlob, { contentType: 'image/webp' });
-                const url = await fileRef.getDownloadURL();
                 
+                const formData = new FormData();
+                formData.append('file', compressedBlob, 'photo.webp');
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                const cloudinaryRes = await fetch(CLOUDINARY_UPLOAD_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const cloudinaryData = await cloudinaryRes.json();
+                
+                if (!cloudinaryData.secure_url) throw new Error("Cloudinary upload failed");
+
                 await db.collection("test_photos").add({
-                    url: url,
+                    url: cloudinaryData.secure_url,
                     ownerId: myUserId,
-                    storagePath: fileRef.fullPath,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Upload error: ", error);
-                alert("Failed to upload photo. Please try another image.");
+                alert("Failed to upload photo. Please try again.");
             } finally {
                 photoInput.value = ''; 
+                uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
             }
-            
-            uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
         });
 
-        // Listen for photo updates
         db.collection("test_photos").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             photoGrid.innerHTML = '';
             myPhotoCount = 0;
@@ -781,7 +773,7 @@
                 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                  deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}', '${data.storagePath}')">DELETE</button>`;
+                  deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
                 }
                 
                 item.innerHTML = `
@@ -804,12 +796,10 @@
 
         voiceBtn.addEventListener('click', async () => {
             if (!isRecording) {
-                // 1. Check Total Invitation Limit First
                 if (totalVoiceCount >= MAX_TOTAL_VOICES && !isAdmin) {
                     alert(`The voice message inbox is full (${MAX_TOTAL_VOICES} messages maximum).`);
                     return;
                 }
-                // 2. Check Individual Guest Limit Second
                 if (myVoiceCount >= 1 && !isAdmin) {
                     alert("You have already shared a voice message (limit is 1 per guest).");
                     return;
@@ -817,9 +807,20 @@
                 
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    // LOWER AUDIO BITRATE FOR FASTER UPLOADS (32kbps)
-                    const options = { audioBitsPerSecond: 32000 };
-                    mediaRecorder = new MediaRecorder(stream, options);
+                    
+                    let options = {};
+                    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                        options = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 32000 };
+                    } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        options = { mimeType: 'audio/mp4', audioBitsPerSecond: 32000 };
+                    }
+
+                    try {
+                        mediaRecorder = new MediaRecorder(stream, options);
+                    } catch (e) {
+                        mediaRecorder = new MediaRecorder(stream);
+                    }
+
                     mediaRecorder.start();
                     isRecording = true;
                     
@@ -840,15 +841,21 @@
                         audioChunks = [];
                         
                         try {
-                            const storageRef = storage.ref();
-                            const fileRef = storageRef.child(`test_voice/${Date.now()}.mp4`);
-                            await fileRef.put(audioBlob);
-                            const url = await fileRef.getDownloadURL();
-                            
+                            const formData = new FormData();
+                            formData.append('file', audioBlob, 'voice.mp4');
+                            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                            const cloudinaryRes = await fetch(CLOUDINARY_UPLOAD_URL, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            const cloudinaryData = await cloudinaryRes.json();
+
+                            if (!cloudinaryData.secure_url) throw new Error("Cloudinary upload failed");
+
                             await db.collection("test_voice").add({
-                                url: url,
+                                url: cloudinaryData.secure_url,
                                 ownerId: myUserId,
-                                storagePath: fileRef.fullPath,
                                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
                             });
                         } catch (err) {
@@ -867,7 +874,6 @@
             }
         });
 
-        // Listen for voice message updates
         db.collection("test_voice").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             voicesDisplay.innerHTML = '';
             myVoiceCount = 0;
@@ -882,7 +888,7 @@
                 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                    deleteHTML = `<button class="delete-btn" style="position:relative; top:0; right:0;" onclick="deleteItem('test_voice', '${doc.id}', '${data.storagePath}')">DELETE</button>`;
+                    deleteHTML = `<button class="delete-btn" style="position:relative; top:0; right:0;" onclick="deleteItem('test_voice', '${doc.id}')">DELETE</button>`;
                 }
                 
                 item.innerHTML = `
@@ -894,27 +900,19 @@
         });
 
         /* ================= GLOBAL DELETE LOGIC ================= */
-        // Handles deletion for both Photos and Voice messages
-        window.deleteItem = async function(collectionName, docId, storagePath) {
+        window.deleteItem = async function(collectionName, docId) {
             if (!confirm('Are you sure you want to delete this?')) return;
             try {
-                // Delete from Firestore
                 await db.collection(collectionName).doc(docId).delete();
-                // Delete from Storage
-                if(storagePath) {
-                    await storage.ref().child(storagePath).delete();
-                }
             } catch (error) {
                 console.error("Error deleting item:", error);
             }
         };
 
-
         /* ================= TEXT GUESTBOOK LOGIC ================= */
         const wishForm = document.getElementById('guestbook-form');
         const wishesDisplay = document.getElementById('wishes-display');
 
-        // Write to test_wishes collection
         wishForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('guest-name').value;
@@ -930,7 +928,6 @@
             }).catch((error) => console.error("Error writing document: ", error));
         });
 
-        // Listen for updates from test_wishes collection
         db.collection("test_wishes").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             wishesDisplay.innerHTML = '';
             querySnapshot.forEach((doc) => {
@@ -940,7 +937,7 @@
                 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                    deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_wishes', '${doc.id}', null)">DELETE</button>`;
+                    deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_wishes', '${doc.id}')">DELETE</button>`;
                 }
 
                 card.innerHTML = `

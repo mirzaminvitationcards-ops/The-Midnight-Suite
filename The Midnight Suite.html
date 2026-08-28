@@ -64,7 +64,7 @@
             box-shadow: inset 10px -8px 0 0 #EAEDF4;
             /* A soft, natural lunar glow */
             filter: drop-shadow(0 0 12px rgba(234, 237, 244, 0.8));
-            z-index: -1; /* FIX: Pushed behind the text securely */
+            z-index: -1; 
             pointer-events: none; 
         }
 
@@ -677,8 +677,7 @@
         let totalPhotoCount = 0;
         let totalVoiceCount = 0;
 
-        /* ================= CLIENT-SIDE IMAGE COMPRESSOR (OPTIMIZED FOR SPEED) ================= */
-        // FIX: The parameters here were originally 800 and 0.6, but the old code still explicitly called 1200 and 0.75 later down. This is fixed!
+        /* ================= CLIENT-SIDE IMAGE COMPRESSOR (OPTIMIZED FOR SPEED & WEBP) ================= */
         function compressImage(file, maxWidth = 800, quality = 0.6) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -701,13 +700,14 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
+                        // CHANGED TO WEBP FOR FASTER UPLOADS
                         canvas.toBlob((blob) => {
                             if (blob) {
                                 resolve(blob);
                             } else {
                                 reject(new Error('Canvas compression failed'));
                             }
-                        }, 'image/jpeg', quality);
+                        }, 'image/webp', quality);
                     };
                     img.onerror = (err) => reject(err);
                 };
@@ -742,11 +742,12 @@
             uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> OPTIMIZING & UPLOADING...';
             
             try {
-                // FIX: Changed from (file, 1200, 0.75) to (file, 800, 0.6) so it actually processes extremely fast!
                 const compressedBlob = await compressImage(file, 800, 0.6);
                 const storageRef = storage.ref();
-                const fileRef = storageRef.child(`test_photos/${Date.now()}_photo.jpg`);
-                await fileRef.put(compressedBlob, { contentType: 'image/jpeg' });
+                // CHANGED EXTENSION TO .webp
+                const fileRef = storageRef.child(`test_photos/${Date.now()}_photo.webp`);
+                // CHANGED CONTENT TYPE TO image/webp
+                await fileRef.put(compressedBlob, { contentType: 'image/webp' });
                 const url = await fileRef.getDownloadURL();
                 
                 await db.collection("test_photos").add({
@@ -769,7 +770,7 @@
         db.collection("test_photos").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             photoGrid.innerHTML = '';
             myPhotoCount = 0;
-            totalPhotoCount = querySnapshot.size; // Tracks total photos across the whole invitation
+            totalPhotoCount = querySnapshot.size; 
             
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
@@ -816,7 +817,9 @@
                 
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                    // LOWER AUDIO BITRATE FOR FASTER UPLOADS (32kbps)
+                    const options = { audioBitsPerSecond: 32000 };
+                    mediaRecorder = new MediaRecorder(stream, options);
                     mediaRecorder.start();
                     isRecording = true;
                     
@@ -868,7 +871,7 @@
         db.collection("test_voice").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             voicesDisplay.innerHTML = '';
             myVoiceCount = 0;
-            totalVoiceCount = querySnapshot.size; // Tracks total voice notes across the whole invitation
+            totalVoiceCount = querySnapshot.size; 
             
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
@@ -879,7 +882,6 @@
                 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                    // FIX: Changed from 'test_photos' to 'test_voice'
                     deleteHTML = `<button class="delete-btn" style="position:relative; top:0; right:0;" onclick="deleteItem('test_voice', '${doc.id}', '${data.storagePath}')">DELETE</button>`;
                 }
                 
@@ -938,7 +940,6 @@
                 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                    // FIX: Changed from 'test_photos' to 'test_wishes' and removed the invalid data.storagePath reference
                     deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_wishes', '${doc.id}', null)">DELETE</button>`;
                 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Engagement Invitation - [Partner 1] & [Partner 2]</title>
+    <title>Engagement Invitation - Maheer & Layla </title>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:ital,wght@1,400&family=Inter:wght@400;700;800&family=Montserrat:wght@800&display=swap" rel="stylesheet">
@@ -29,7 +29,10 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html { scroll-behavior: auto; } 
+        html {
+            scroll-behavior: auto;
+            overflow-y: scroll; /* Forces scrollbar gutter to stay visible, fixing screen shift */
+        } 
 
         body {
             font-family: 'Inter', sans-serif;
@@ -220,6 +223,27 @@
         .map-link-btn:hover { background: rgba(253, 226, 159, 0.1); }
 
         /* =========================================
+           DAY SCHEDULE & RSVP PLACEHOLDERS
+           ========================================= */
+        .schedule-section { margin-top: 50px; margin-bottom: 50px; padding: 0 10px; }
+        .timeline { position: relative; max-width: 400px; margin: 40px auto; }
+        .timeline-item { display: flex; align-items: center; width: 100%; margin-bottom: 40px; position: relative; z-index: 1; }
+        .time { flex: 1; text-align: right; padding-right: 25px; font-size: 20px; font-weight: 700; color: var(--white); }
+        .dot-container { width: 20px; display: flex; justify-content: center; }
+        .dot { width: 14px; height: 14px; background-color: var(--moonlight); border-radius: 50%; border: 3px solid var(--midnight); box-shadow: 0 0 10px rgba(253, 226, 159, 0.2); }
+        .event { flex: 1; text-align: left; padding-left: 15px; font-size: 16px; font-weight: 800; color: var(--silver); }
+
+        .rsvp-section { margin-bottom: 50px; padding: 0 10px; }
+        .rsvp-placeholder-box { background: var(--card-bg); padding: 25px; border-radius: 25px; max-width: 400px; margin: 0 auto; border: 1px dashed var(--border-color); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .rsvp-input { width: 100%; padding: 15px 20px; border-radius: 15px; border: 1px solid var(--border-color); background: transparent; color: var(--silver); margin-bottom: 15px; font-family: 'Inter', sans-serif; outline: none; font-size: 14px; }
+        .guest-counter-container { display: flex; justify-content: space-between; align-items: center; background: transparent; padding: 12px 20px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .guest-label { font-size: 13px; color: var(--silver); font-weight: 700; }
+        .counter-controls { display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .cnt-btn { display: flex; align-items: center; justify-content: center; background: transparent; color: var(--moonlight); border: none; font-size: 20px; cursor: not-allowed; }
+        #guest-count-display { font-size: 20px; font-weight: 800; min-width: 30px; text-align: center; color: var(--white); }
+        .rsvp-confirm-btn { width: 100%; padding: 16px; background: var(--moonlight); color: var(--midnight); border: none; border-radius: 50px; font-weight: 700; font-size: 15px; cursor: not-allowed; transition: 0.3s; opacity: 0.5; }
+
+        /* =========================================
            5. GUEST GALLERY & VOICE RECORD
            ========================================= */
         .upload-btn {
@@ -237,10 +261,61 @@
             aspect-ratio: 1; background: var(--navy); border-radius: 10px; border: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: center; color: var(--silver); font-size: 24px;
             overflow: hidden;
+            cursor: pointer;
         }
-        .guest-photo-item img, .guest-photo-item video {
+        .guest-photo-item img {
             width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
         }
+
+        /* FULLSCREEN LIGHTBOX GALLERY MODAL WITH NAVIGATION */
+        #lightbox-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 30000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        #lightbox-modal img {
+            max-width: 85%;
+            max-height: 85vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            object-fit: contain;
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: 0.3s;
+            z-index: 30001;
+        }
+        .lightbox-nav:hover { background: rgba(255, 255, 255, 0.4); }
+        #lightbox-prev { left: 20px; }
+        #lightbox-next { right: 20px; }
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 35px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 30001;
+        }
+
         .delete-btn {
             position: absolute; 
             top: 8px; 
@@ -302,14 +377,6 @@
         .wish-card h4 { font-size: 14px; font-weight: 800; color: var(--moonlight); text-transform: uppercase; margin-bottom: 5px; }
         .wish-card p { font-size: 14px; color: var(--white); line-height: 1.5; }
 
-        .oval-btn { 
-            display: inline-block; padding: 16px 70px; background: transparent; color: var(--moonlight); 
-            border: 1px solid var(--moonlight); border-radius: 50px; font-family: 'Inter', sans-serif;
-            font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; 
-            margin-top: 40px; transition: 0.3s; cursor: pointer;
-        }
-        .oval-btn:hover { background: rgba(253, 226, 159, 0.1); }
-
         /* =========================================
            7. MIRZAM CREDIT FOOTER 
            ========================================= */
@@ -319,7 +386,7 @@
         .mirzam-circular-logo:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(253, 226, 159, 0.3); }
 
         /* =========================================
-           8. FLOATING TAB BAR
+           8. FLOATING TAB BAR & MODALS
            ========================================= */
         .floating-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 500px;
@@ -332,6 +399,19 @@
         .nav-item i { font-size: 18px; }
         .nav-item span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
 
+        /* Submenus */
+        .location-submenu { position: absolute; bottom: 85px; transform: translateX(-50%) scale(0); background: var(--card-bg); border: 1px solid var(--border-color); width: 180px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom center; visibility: hidden; opacity: 0; backdrop-filter: blur(10px); }
+        .location-submenu.active { transform: translateX(-50%) scale(1); visibility: visible; opacity: 1; }
+        .location-submenu a { display: flex; align-items: center; gap: 12px; padding: 18px; text-decoration: none; color: var(--moonlight); font-size: 14px; font-weight: 700; transition: 0.2s; }
+        .location-submenu a:hover { background: rgba(253, 226, 159, 0.1); }
+        .menu-divider { height: 1px; background: var(--border-color); margin: 0 10px; }
+
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(11, 16, 33, 0.8); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border-color); animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 28px; color: var(--silver); cursor: pointer; }
+
         @media screen and (max-width: 768px) {
             .main-content { padding: 40px 15px 140px 15px; }
             .title { font-size: 24px; }
@@ -340,10 +420,19 @@
             .countdown-num { font-size: 22px; }
             .countdown-label { font-size: 9px; }
             .countdown-container { gap: 10px; }
+            .floating-nav { bottom: 15px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- FULLSCREEN LIGHTBOX GALLERY MODAL -->
+    <div id="lightbox-modal">
+        <span id="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <button class="lightbox-nav" id="lightbox-prev" onclick="changeSlide(-1)">&#10094;</button>
+        <img id="lightbox-img" src="" alt="Fullscreen View">
+        <button class="lightbox-nav" id="lightbox-next" onclick="changeSlide(1)">&#10095;</button>
+    </div>
 
     <!-- COMPLETELY OPAQUE OVERLAY -->
     <div id="blur-overlay">
@@ -363,10 +452,10 @@
         <div class="blue-line"></div>
 
         <div class="names-stack">
-            <h2 class="main-name">[PARTNER 1]</h2>
+            <h2 class="main-name">Maheer</h2>
             <span class="role">FIANCÉ</span>
             <span class="small-ampersand">&</span>
-            <h2 class="main-name">[PARTNER 2]</h2>
+            <h2 class="main-name">Layla</h2>
             <span class="role">FIANCÉE</span>
         </div>
 
@@ -384,8 +473,8 @@
             <div class="mini-blue-line"></div>
             <h2 class="gallery-title">EVENT INFO</h2>
             <div class="time-date-box">
-                <span class="big-time">[TIME]</span>
-                <span class="big-date">[DAY] | [MONTH] | [DATE]</span>
+                <span class="big-time">07:00 PM</span>
+                <span class="big-date">FRIDAY  | 04  | December</span>
             </div>
 
             <!-- COUNTDOWN SECTION -->
@@ -417,19 +506,55 @@
             <a href="[MAP_LINK_URL]" target="_blank" class="map-link-btn">VIEW ON MAP</a>
         </div>
 
-        <!-- GUEST PHOTO/VIDEO GALLERY SECTION -->
+        <!-- DAY SCHEDULE PLACEHOLDER -->
+        <div class="schedule-section" id="schedule-section">
+            <div class="mini-blue-line"></div>
+            <h3 class="gallery-title">DAY SCHEDULE</h3>
+            <p class="announcement">A glimpse of our special night</p>
+            <div class="timeline">
+                <div class="timeline-item"><div class="time">07:00</div><div class="dot-container"><div class="dot"></div></div><div class="event">Welcome</div></div>
+                <div class="timeline-item"><div class="time">08:00</div><div class="dot-container"><div class="dot"></div></div><div class="event">Katb ketab</div></div>
+                <div class="timeline-item"><div class="time">08:30</div><div class="dot-container"><div class="dot"></div></div><div class="event">Party</div></div>
+                <div class="timeline-item"><div class="time">09:30</div><div class="dot-container"><div class="dot"></div></div><div class="event">Buffet</div></div>
+                <div class="timeline-item"><div class="time">11:00</div><div class="dot-container"><div class="dot"></div></div><div class="event">End</div></div>
+            </div>
+        </div>
+
+        <!-- RSVP PLACEHOLDER -->
+        <div class="rsvp-section" id="rsvp-section">
+            <div class="mini-blue-line"></div>
+            <h3 class="gallery-title">ATTENDANCE</h3>
+            <p class="announcement" style="margin-bottom: 20px;">Will you join us?Confirm your attendance</p>
+            
+            <div class="rsvp-placeholder-box">
+                <input type="text" class="rsvp-input" placeholder="Your name" disabled style="cursor: not-allowed; opacity: 0.6;">
+                
+                <div class="guest-counter-container" style="opacity: 0.6;">
+                    <span class="guest-label">Accompanying guests</span>
+                    <div class="counter-controls">
+                        <button type="button" class="cnt-btn" disabled>−</button>
+                        <span id="guest-count-display">0</span>
+                        <button type="button" class="cnt-btn" disabled>+</button>
+                    </div>
+                </div>
+
+                <button type="button" class="rsvp-confirm-btn" disabled>Confirm Attendance 💍</button>
+            </div>
+        </div>
+
+        <!-- GUEST PHOTO-ONLY GALLERY SECTION -->
         <div class="guest-gallery-section" id="guest-gallery-section" style="margin-top: 50px;">
             <div class="mini-blue-line"></div>
             <h3 class="gallery-title">GUEST MEMORIES</h3>
-            <p class="announcement">Share your favorite photos or videos with us</p>
+            <p class="announcement">Share your favorite photos with us</p>
 
-            <input type="file" id="photo-upload-input" accept="image/*,video/*" style="display: none;">
+            <input type="file" id="photo-upload-input" accept="image/*" style="display: none;">
             <button class="upload-btn" id="upload-photo-btn">
                 <i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
-                SHARE A MEMORY
+                SHARE A PHOTO
             </button>
             <div class="guest-photo-grid" id="guest-photo-grid">
-                <!-- Dynamically populated media -->
+                <!-- Dynamically populated photos -->
             </div>
         </div>
 
@@ -462,10 +587,7 @@
             <div id="wishes-display" class="wishes-container"></div>
         </div>
 
-        <!-- GO BACK BUTTON -->
-        <button onclick="window.location.reload()" class="oval-btn">GO BACK</button>
-
-        <!-- MIRZAM CREDIT BADGE -->
+        <!-- MIRZAM CREDIT FOOTER -->
         <div class="credit-badge-container">
             <span class="made-by-text">made by Mirzam</span> 
             <a href="https://mirzaminvitationcards-ops.github.io/mirzam.eg/Mirzam's_Main_page" target="_blank">
@@ -474,26 +596,53 @@
         </div>
     </div>
 
-    <!-- UPDATED FLOATING NAVIGATION -->
+    <!-- AFTER PARTY MODAL -->
+    <div id="partyModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">×</span>
+            <h3 class="gallery-title" style="font-size: 20px; margin-top: 10px;">AFTER PARTY</h3>
+            <div class="mini-blue-line"></div>
+            <p class="venue-name" style="font-size: 18px;">Private Celebration</p>
+            <p class="venue-location">Click below to find the secret location.</p>
+            <a href="#" target="_blank" class="map-link-btn" style="margin-top: 10px;">OPEN IN GOOGLE MAPS</a>
+        </div>
+    </div>
+
+    <!-- FLOATING NAVIGATION BAR -->
     <nav class="floating-nav">
+        <!-- Location Submenu -->
+        <div id="locationSubMenu" class="location-submenu" style="left: 60%;">
+            <a href="javascript:void(0)" onclick="scrollToSection('venue-section')"><i class="fas fa-map-marker-alt"></i> Venue</a>
+            <div class="menu-divider"></div>
+            <a href="javascript:void(0)" onclick="accessAfterParty()"><i class="fas fa-moon"></i> After Party</a>
+        </div>
+
+        <!-- Gallery Submenu -->
+        <div id="gallerySubMenu" class="location-submenu" style="left: 20%;">
+            <a href="javascript:void(0)" onclick="scrollToSection('gallery-section')"><i class="far fa-image"></i> Couple</a>
+            <div class="menu-divider"></div>
+            <a href="javascript:void(0)" onclick="scrollToSection('guest-gallery-section')"><i class="fas fa-camera-retro"></i> Memories</a>
+        </div>
+
+        <!-- Main Navigation Icons -->
         <div class="nav-container">
-            <a href="javascript:void(0)" onclick="scrollToSection('gallery-section')" class="nav-item">
-                <i class="far fa-images"></i><span>Couple</span>
-            </a>
-            <a href="javascript:void(0)" onclick="scrollToSection('guest-gallery-section')" class="nav-item">
-                <i class="fas fa-camera"></i><span>Photos</span>
+            <a href="javascript:void(0)" onclick="toggleGalleryMenu(event)" class="nav-item">
+                <i class="far fa-images"></i><span>Gallery</span>
             </a>
             <a href="javascript:void(0)" onclick="scrollToSection('voice-message-section')" class="nav-item">
                 <i class="fas fa-microphone"></i><span>Voice</span>
             </a>
-            <a href="javascript:void(0)" onclick="scrollToSection('venue-section')" class="nav-item">
+            <a href="javascript:void(0)" onclick="scrollToSection('rsvp-section')" class="nav-item">
+                <i class="far fa-heart"></i><span>RSVP</span>
+            </a>
+            <a href="javascript:void(0)" onclick="toggleLocationMenu(event)" class="nav-item">
                 <i class="fas fa-map-marker-alt"></i><span>Location</span>
             </a>
             <a href="javascript:void(0)" onclick="scrollToSection('guestbook-section')" class="nav-item">
                 <i class="far fa-comment-dots"></i><span>Wishes</span>
             </a>
             <div class="nav-item" onclick="toggleMusic()" style="cursor:pointer;">
-                <i id="navMusicIcon" class="fas fa-pause"></i>
+                <i id="navMusicIcon" class="fas fa-play"></i>
                 <span id="navMusicText">Stop</span>
             </div>
         </div>
@@ -568,12 +717,89 @@
             }, 1000); 
         }
 
+        /* --- LIGHTBOX GALLERY NAVIGATION LOGIC --- */
+        let galleryImages = [];
+        let currentIndex = 0;
+
+        function openLightbox(url) {
+            currentIndex = galleryImages.indexOf(url);
+            if (currentIndex === -1) currentIndex = 0;
+            updateLightboxImage();
+            document.getElementById('lightbox-modal').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').style.display = 'none';
+        }
+
+        function changeSlide(direction) {
+            if (galleryImages.length === 0) return;
+            currentIndex += direction;
+            if (currentIndex < 0) {
+                currentIndex = galleryImages.length - 1;
+            } else if (currentIndex >= galleryImages.length) {
+                currentIndex = 0;
+            }
+            updateLightboxImage();
+        }
+
+        function updateLightboxImage() {
+            if (galleryImages.length > 0) {
+                document.getElementById('lightbox-img').src = galleryImages[currentIndex];
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                if (e.key === 'ArrowRight') changeSlide(1);
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        /* --- NAV TOGGLES --- */
+        function toggleLocationMenu(event) {
+            event.stopPropagation();
+            document.getElementById('locationSubMenu').classList.toggle('active');
+            document.getElementById('gallerySubMenu').classList.remove('active');
+        }
+
+        function toggleGalleryMenu(event) {
+            event.stopPropagation();
+            document.getElementById('gallerySubMenu').classList.toggle('active');
+            document.getElementById('locationSubMenu').classList.remove('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const locMenu = document.getElementById('locationSubMenu');
+            const galMenu = document.getElementById('gallerySubMenu');
+            if (locMenu && !locMenu.contains(e.target)) locMenu.classList.remove('active');
+            if (galMenu && !galMenu.contains(e.target)) galMenu.classList.remove('active');
+        });
+
         function scrollToSection(id) {
             const section = document.getElementById(id);
             if (section) {
                 stopAutoScroll(); 
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
+            const locMenu = document.getElementById('locationSubMenu');
+            const galMenu = document.getElementById('gallerySubMenu');
+            if (locMenu) locMenu.classList.remove('active');
+            if (galMenu) galMenu.classList.remove('active');
+        }
+
+        function accessAfterParty() {
+            if (prompt("Access code:") === "6627") {
+                document.getElementById('partyModal').style.display = 'flex';
+            } else {
+                alert("Wrong code.");
+            }
+        }
+
+        function closeModal() { 
+            document.getElementById('partyModal').style.display = 'none'; 
         }
 
         function toggleMusic() {
@@ -641,12 +867,14 @@
         const ACTIVE_PLAN = "Astra"; 
 
         const PLAN_LIMITS = {
-            "Astra":  { totalPhotos: 50, totalVoice: 20 },
-            "Aurora": { totalPhotos: 250, totalVoice: 100 }
+            "Astra":  { totalPhotos: 50, totalVoice: 20, userMaxPhotos: 3, userMaxVoices: 1 },
+            "Aurora": { totalPhotos: 250, totalVoice: 100, userMaxPhotos: 5, userMaxVoices: 2 }
         };
 
         const MAX_TOTAL_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].totalPhotos;
         const MAX_TOTAL_VOICES = PLAN_LIMITS[ACTIVE_PLAN].totalVoice;
+        const USER_MAX_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].userMaxPhotos;
+        const USER_MAX_VOICES = PLAN_LIMITS[ACTIVE_PLAN].userMaxVoices;
 
         let totalPhotoCount = 0;
         let totalVoiceCount = 0;
@@ -685,7 +913,7 @@
             });
         }
 
-        /* ================= PHOTO & VIDEO UPLOAD LOGIC ================= */
+        /* ================= PHOTO-ONLY UPLOAD LOGIC ================= */
         const photoInput = document.getElementById('photo-upload-input');
         const uploadBtn = document.getElementById('upload-photo-btn');
         const photoGrid = document.getElementById('guest-photo-grid');
@@ -696,8 +924,8 @@
                 alert(`The gallery is full (${MAX_TOTAL_PHOTOS} memories maximum).`);
                 return;
             }
-            if (myPhotoCount >= 3) {
-                alert("You have reached your personal limit of 3 uploads.");
+            if (myPhotoCount >= USER_MAX_PHOTOS) {
+                alert(`You have reached your personal limit of ${USER_MAX_PHOTOS} uploads.`);
                 return;
             }
             photoInput.click();
@@ -707,9 +935,8 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            const isVideo = file.type.startsWith('video/');
-            if (isVideo && file.size > 15 * 1024 * 1024) {
-                alert("Video is too large! Please choose a short clip under 15MB.");
+            if (!file.type.startsWith('image/')) {
+                alert("Only photo uploads are allowed!");
                 photoInput.value = '';
                 return;
             }
@@ -717,12 +944,8 @@
             uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> UPLOADING...';
 
             try {
-                let fileToUpload = file;
-                let fileName = isVideo ? 'video.mp4' : 'photo.webp';
-
-                if (!isVideo) {
-                    fileToUpload = await compressImage(file, 800, 0.6);
-                }
+                let fileToUpload = await compressImage(file, 800, 0.6);
+                let fileName = 'photo.webp';
 
                 const formData = new FormData();
                 formData.append('file', fileToUpload, fileName);
@@ -738,7 +961,7 @@
 
                 await db.collection("test_photos").add({
                     url: cloudinaryData.secure_url,
-                    type: isVideo ? 'video' : 'image',
+                    type: 'image',
                     ownerId: myUserId,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -747,7 +970,7 @@
                 alert("Failed to upload. Please try again.");
             } finally {
                 photoInput.value = ''; 
-                uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A MEMORY';
+                uploadBtn.innerHTML = '<i class="fas fa-camera-retro" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> SHARE A PHOTO';
             }
         });
 
@@ -755,29 +978,26 @@
             photoGrid.innerHTML = '';
             myPhotoCount = 0;
             totalPhotoCount = querySnapshot.size; 
+            galleryImages = []; // Reset array for lightbox navigation
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 if (data.ownerId === myUserId) myPhotoCount++;
 
+                galleryImages.push(data.url); // Populate array for lightbox slider
+
                 const item = document.createElement('div');
                 item.className = 'guest-photo-item';
+                item.setAttribute('onclick', `openLightbox('${data.url}')`);
 
                 let deleteHTML = '';
                 if (isAdmin || data.ownerId === myUserId) {
-                  deleteHTML = `<button class="delete-btn" onclick="deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
-                }
-
-                let mediaHTML = '';
-                if (data.type === 'video') {
-                    mediaHTML = `<video src="${data.url}" controls playsinline></video>`;
-                } else {
-                    mediaHTML = `<img src="${data.url}" alt="Guest Memory">`;
+                    deleteHTML = `<button class="delete-btn" onclick="event.stopPropagation(); deleteItem('test_photos', '${doc.id}')">DELETE</button>`;
                 }
 
                 item.innerHTML = `
                     ${deleteHTML}
-                    ${mediaHTML}
+                    <img src="${data.url}" alt="Guest Memory">
                 `;
                 photoGrid.appendChild(item);
             });
@@ -830,9 +1050,6 @@
                     voiceBtn.style.background = 'red';
                     voiceBtn.style.color = 'white';
 
-                    // ==========================================
-                    // THE TIMER TEXT IS SET RIGHT HERE!
-                    // ==========================================
                     voiceText.innerText = 'RECORDING... 0s / 60s (TAP TO STOP)';
 
                     recordTimer = setInterval(() => {

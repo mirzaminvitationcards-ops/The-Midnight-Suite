@@ -31,7 +31,7 @@
 
         html {
             scroll-behavior: auto;
-            overflow-y: scroll; /* Forces scrollbar gutter to stay visible, fixing screen shift */
+            overflow-y: scroll; 
         } 
 
         body {
@@ -212,6 +212,16 @@
 
         .countdown-num { font-size: 26px; font-weight: 800; color: var(--moonlight); margin-bottom: 4px; }
         .countdown-label { font-size: 10px; font-weight: 800; color: var(--silver); text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        .calendar-img {
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin: 0 auto;
+            display: block;
+            
+        }
 
         .venue-name { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--white); }
         .venue-location { font-size: 14px; margin: 5px 0 15px; color: var(--silver); font-style: italic; }
@@ -496,6 +506,9 @@
                     <span class="countdown-label">SECS</span>
                 </div>
             </div>
+            
+            <!-- NEW CALENDAR IMAGE -->
+            <img src="The_Midnight_suite_challander.webp" alt="December 2026 Calendar" class="calendar-img">
         </div>
 
         <div class="venue-section" id="venue-section">
@@ -822,8 +835,8 @@
         }
 
         function startCountdown() {
-            /*
-            const targetDate = new Date("Dec 31, 2026 00:00:00").getTime();
+            const targetDate = new Date("Dec 4, 2026 19:00:00").getTime();
+            
             const timer = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
@@ -843,7 +856,6 @@
                 document.getElementById("cd-mins").innerText = mins < 10 ? "0" + mins : mins;
                 document.getElementById("cd-secs").innerText = secs < 10 ? "0" + secs : secs;
             }, 1000);
-            */
         }
 
         /* --- FIREBASE CONFIGURATION (FIRESTORE ONLY) --- */

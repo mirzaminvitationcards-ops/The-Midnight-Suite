@@ -879,17 +879,22 @@
         const ACTIVE_PLAN = "Astra"; 
 
         const PLAN_LIMITS = {
-            "Astra":  { totalPhotos: 50, totalVoice: 20, userMaxPhotos: 3, userMaxVoices: 1 },
-            "Aurora": { totalPhotos: 250, totalVoice: 100, userMaxPhotos: 5, userMaxVoices: 2 }
+            "Astra":  { totalPhotos: 50, totalVoice: 20, totalWishes: 100, userMaxPhotos: 3, userMaxVoices: 1, userMaxWishes: 1 },
+            "Aurora": { totalPhotos: 250, totalVoice: 100, totalWishes: 500, userMaxPhotos: 5, userMaxVoices: 2, userMaxWishes: 3 }
         };
 
         const MAX_TOTAL_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].totalPhotos;
         const MAX_TOTAL_VOICES = PLAN_LIMITS[ACTIVE_PLAN].totalVoice;
+        const MAX_TOTAL_WISHES = PLAN_LIMITS[ACTIVE_PLAN].totalWishes;
         const USER_MAX_PHOTOS = PLAN_LIMITS[ACTIVE_PLAN].userMaxPhotos;
         const USER_MAX_VOICES = PLAN_LIMITS[ACTIVE_PLAN].userMaxVoices;
+        const USER_MAX_WISHES = PLAN_LIMITS[ACTIVE_PLAN].userMaxWishes;
 
         let totalPhotoCount = 0;
         let totalVoiceCount = 0;
+        let totalWishCount = 0;
+        
+        let myWishCount = 0; 
 
         /* ================= CLIENT-SIDE IMAGE COMPRESSOR (WEBP) ================= */
         function compressImage(file, maxWidth = 800, quality = 0.6) {
@@ -1034,8 +1039,8 @@
                     alert(`The voice message inbox is full (${MAX_TOTAL_VOICES} messages maximum).`);
                     return;
                 }
-                if (myVoiceCount >= 1) {
-                    alert("You have already shared a voice message (limit is 1 per guest).");
+                if (myVoiceCount >= USER_MAX_VOICES) {
+                    alert(`You have already shared a voice message (limit is ${USER_MAX_VOICES} per guest).`);
                     return;
                 }
 
@@ -1165,6 +1170,18 @@
 
         wishForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // === NEW: Enforce Guestbook Limits ===
+            if (totalWishCount >= MAX_TOTAL_WISHES) {
+                alert(`The guestbook is full (${MAX_TOTAL_WISHES} wishes maximum).`);
+                return;
+            }
+            if (myWishCount >= USER_MAX_WISHES) {
+                alert(`You have reached your personal limit of ${USER_MAX_WISHES} wish(es).`);
+                return;
+            }
+            // ======================================
+
             const name = document.getElementById('guest-name').value;
             const wish = document.getElementById('guest-wish').value;
 
@@ -1180,8 +1197,15 @@
 
         db.collection("test_wishes").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             wishesDisplay.innerHTML = '';
+            totalWishCount = querySnapshot.size; // Update global total wish count
+            myWishCount = 0; // Reset user specific count
+
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
+                
+                // Track user specific wish count
+                if (data.ownerId === myUserId) myWishCount++;
+
                 const card = document.createElement('div');
                 card.className = 'wish-card';
 

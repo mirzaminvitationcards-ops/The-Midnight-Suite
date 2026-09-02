@@ -432,9 +432,42 @@
             .countdown-container { gap: 10px; }
             .floating-nav { bottom: 15px; }
         }
+
+/* =========================================
+           GO BACK BUTTON (ENGLISH)
+           ========================================= */
+        .go-back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px; /* On the left for English */
+            z-index: 9999;
+            background: var(--card-bg);
+            color: var(--silver);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        .go-back-btn:hover {
+            background: var(--moonlight);
+            color: var(--midnight);
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- GO BACK BUTTON -->
+    <button onclick="closeInvitation()" class="go-back-btn" title="Go Back">
+        <i class="fas fa-arrow-left"></i>
+    </button>
 
     <!-- FULLSCREEN LIGHTBOX GALLERY MODAL -->
     <div id="lightbox-modal">
@@ -728,6 +761,26 @@
 
                 startCountdown();
             }, 1000); 
+        }
+
+        function closeInvitation() {
+            // Stop auto-scrolling
+            stopAutoScroll();
+            
+            // Pause the music and reset it to the beginning (0 seconds)
+            weddingAudio.pause();
+            weddingAudio.currentTime = 0; 
+            updateMusicUI();
+            
+            // Scroll instantly back to the top
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            
+            // Show the blur overlay again
+            const overlay = document.getElementById('blur-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 50);
         }
 
         /* --- LIGHTBOX GALLERY NAVIGATION LOGIC --- */
